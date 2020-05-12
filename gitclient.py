@@ -1,3 +1,13 @@
+from os import system as execute
+from os.path import isdir, basename, abspath
+from sys import exit
+import sentry_sdk
+from sentry_sdk import configure_scope
+sentry_sdk.init("https://51cbbd7414b44db98ebd3b23b68c12ab@o238115.ingest.sentry.io/5238337")
+
+
+
+import configparser
 def yes_or_no(message):
 	x=input(message)
 	while(x!="yes" and x!="no"):
@@ -6,8 +16,6 @@ def yes_or_no(message):
 	return (x=="yes")
 
 
-
-import configparser
 config = configparser.ConfigParser()
 properties_file='properties.ini'
 try:
@@ -30,23 +38,23 @@ else:
 		username=input("please enter your github username: ")
 		config["user"]["name"]=username
 
-import sentry_sdk
-from sentry_sdk import configure_scope
+
 with configure_scope() as scope:
     scope.user = {"email": config["user"]["email"]}
-sentry_sdk.init("https://51cbbd7414b44db98ebd3b23b68c12ab@o238115.ingest.sentry.io/5238337")
-from os import system as execute
-from os.path import isdir, basename
-from sys import exit
+
 
 if not (isdir('./.git')):
 	x=yes_or_no("Do you want to create a new git repository here?(yes/no) ")
 	if (x):
 		link=input("Please enter the repository you want to clone(https link prefered): ")
+		link="https://"+config["user"]["name"]+"@"+link.split("https://")[-1]
 		execute("git clone {}".format(link))
 		folder_created=link.split("/")[-1].split(".")[0]
 		#print(folder_created)
 		execute("cp {} ./{}/{}".format(basename(__file__),folder_created,basename(__file__)))
+		with open(properties_file, 'w') as configfile:    # save
+			config.write(configfile)
+		execute("cp {} ./{}/{}".format(properties_file,folder_created,properties_file))
 	else:
 		print("I cannot run the settings here. You need to run this script in a repository.")
 		exit(1)
