@@ -1,3 +1,5 @@
+import sentry_sdk
+sentry_sdk.init("https://51cbbd7414b44db98ebd3b23b68c12ab@o238115.ingest.sentry.io/5238337")
 from os import system as execute
 from os.path import isdir, basename
 from sys import exit
