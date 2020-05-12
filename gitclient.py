@@ -1,15 +1,43 @@
-import sentry_sdk
-sentry_sdk.init("https://51cbbd7414b44db98ebd3b23b68c12ab@o238115.ingest.sentry.io/5238337")
-from os import system as execute
-from os.path import isdir, basename
-from sys import exit
-
 def yes_or_no(message):
 	x=input(message)
 	while(x!="yes" and x!="no"):
 		print("Wrong input Please try again.")
 		x=input(message)
 	return (x=="yes")
+
+
+
+import configparser
+config = configparser.ConfigParser()
+properties_file='properties.ini'
+try:
+	config.read(properties_file)
+except:
+	pass
+
+if not "user" in config:
+	email=input("please enter your email: ")
+	username=input("please enter your github username: ")
+	config["user"]={
+	"name":username,
+	"email":email
+	}
+else:
+	if not "email" in config["user"]:
+		email=input("please enter your email: ")
+		config["user"]["email"]=email
+	if not "name" in config["user"]:
+		username=input("please enter your github username: ")
+		config["user"]["name"]=username
+
+import sentry_sdk
+from sentry_sdk import configure_scope
+with configure_scope() as scope:
+    scope.user = {"email": config["user"]["email"]}
+sentry_sdk.init("https://51cbbd7414b44db98ebd3b23b68c12ab@o238115.ingest.sentry.io/5238337")
+from os import system as execute
+from os.path import isdir, basename
+from sys import exit
 
 if not (isdir('./.git')):
 	x=yes_or_no("Do you want to create a new git repository here?(yes/no) ")
@@ -32,3 +60,5 @@ else:
 		except:
 			pass
 		execute("git push")
+with open(properties_file, 'w') as configfile:    # save
+	config.write(configfile)
