@@ -42,7 +42,7 @@ else:
 with configure_scope() as scope:
     scope.user = {"email": config["user"]["email"]}
 
-
+selected_repository_dir=None
 if not (isdir('./.git')):
 	x=yes_or_no("Do you want to create a new git repository here?(yes/no) ")
 	if (x):
@@ -50,15 +50,25 @@ if not (isdir('./.git')):
 		link="https://"+config["user"]["name"]+"@"+link.split("https://")[-1]
 		execute("git clone {}".format(link))
 		folder_created=link.split("/")[-1].split(".")[0]
-		#print(folder_created)
-		execute("cp {} ./{}/{}".format(basename(__file__),folder_created,basename(__file__)))
-		with open(properties_file, 'w') as configfile:    # save
-			config.write(configfile)
-		execute("cp {} ./{}/{}".format(properties_file,folder_created,properties_file))
+		if "repositories" not in config:
+			config["repositories"]={folder_created:abspath(folder_created)}
+		else:
+			config["repositories"][folder_created]=abspath(folder_created)
 	else:
-		print("I cannot run the settings here. You need to run this script in a repository.")
-		exit(1)
+		if not "repositories" in config:
+			print("Cannot continue. Exiting")
+			exit(0)
+		for repository in config["repositories"]:
+			print("{}:{}".format(repository,config["repositories"][repository]))
+		while True:
+			try:
+				x=input("Please select a repository: ")
+				selected_repository_dir=config["repositories"][x]
+				break
+			except:
+				print("Wrong repository. Please try again.")
 else:
+	selected_repository_dir="./"
 	upload=yes_or_no("Do you want to upload to git?(yes/no) ")
 	if upload:
 		execute("git add .")
