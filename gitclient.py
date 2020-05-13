@@ -5,8 +5,6 @@ import sentry_sdk
 from sentry_sdk import configure_scope
 sentry_sdk.init("https://51cbbd7414b44db98ebd3b23b68c12ab@o238115.ingest.sentry.io/5238337")
 
-
-
 import configparser
 def yes_or_no(message):
 	x=input(message)
