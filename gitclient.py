@@ -71,12 +71,12 @@ else:
 	selected_repository_dir="./"
 upload=yes_or_no("Do you want to upload to git?(yes/no) ")
 if upload:
-	execute("git add .")
+	execute("cd {}&&git add .".format(selected_repository_dir))
 	message=input("Please enter a message for the upload: ")
 	try:
-		execute("git commit -m '{}'".format(message))
+		execute("cd {}&&git commit -m '{}'".format(selected_repository_dir,message))
 	except:
 		pass
-	execute("git push")
+	execute("cd {}&&git push".format(selected_repository_dir))
 with open(properties_file, 'w') as configfile:    # save
-config.write(configfile)
+	config.write(configfile)
