@@ -1,11 +1,12 @@
 from os import system as execute
-from os.path import isdir, basename, abspath
+from os.path import isdir, basename, abspath, sep
 from sys import exit
 import sentry_sdk
 from sentry_sdk import configure_scope
 sentry_sdk.init("https://51cbbd7414b44db98ebd3b23b68c12ab@o238115.ingest.sentry.io/5238337")
-
 import configparser
+
+
 def yes_or_no(message):
 	x=input(message)
 	while(x!="yes" and x!="no"):
@@ -41,23 +42,34 @@ with configure_scope() as scope:
     scope.user = {"email": config["user"]["email"]}
 
 selected_repository_dir=None
-if not (isdir('./.git')):
+if not (isdir('.git')):
 	x=yes_or_no("Do you want to create a new git repository here?(yes/no) ")
 	if (x):
 		link=input("Please enter the repository you want to clone(https link prefered): ")
 		link="https://"+config["user"]["name"]+"@"+link.split("https://")[-1]
 		execute("git clone {}".format(link))
-		folder_created=link.split("/")[-1].split(".")[0]
+		folder_created=link.split(sep)[-1].split(".")[0]
 		if "repositories" not in config:
 			config["repositories"]={folder_created:abspath(folder_created)}
 		else:
 			config["repositories"][folder_created]=abspath(folder_created)
 	else:
 		if not "repositories" in config:
+			open=yes_or_no("Do you want to open an existing repository?(yes/no) ")
+			if open:
+				while True:
+					dir=input("Please enter the path to the directory where the repository is located: ")
+					if not isdir("{}{}.git".format(dir,sep)):
+						go_on=yes_or_no("Wrong Option.\n Do you want to try again?(yes/no) ")
+						if not go_on:
+							exit(0)
+
 			print("Cannot continue. Exiting")
 			exit(0)
+		print("")
 		for repository in config["repositories"]:
 			print("{}:{}".format(repository,config["repositories"][repository]))
+		print("")
 		while True:
 			try:
 				x=input("Please select a repository: ")
