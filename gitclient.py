@@ -69,14 +69,14 @@ if not (isdir('./.git')):
 				print("Wrong repository. Please try again.")
 else:
 	selected_repository_dir="./"
-	upload=yes_or_no("Do you want to upload to git?(yes/no) ")
-	if upload:
-		execute("git add .")
-		message=input("Please enter a message for the upload: ")
-		try:
-			execute("git commit -m '{}'".format(message))
-		except:
-			pass
-		execute("git push")
+upload=yes_or_no("Do you want to upload to git?(yes/no) ")
+if upload:
+	execute("git add .")
+	message=input("Please enter a message for the upload: ")
+	try:
+		execute("git commit -m '{}'".format(message))
+	except:
+		pass
+	execute("git push")
 with open(properties_file, 'w') as configfile:    # save
-	config.write(configfile)
+config.write(configfile)
